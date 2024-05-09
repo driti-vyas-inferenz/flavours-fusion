@@ -54,7 +54,7 @@ class Login(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
-
+        photo = user.photo.url if user.photo else None,
         return Response(
         {
             'message': 'User Logged In Successfully',
@@ -64,7 +64,7 @@ class Login(ObtainAuthToken):
                 'last_name': user.last_name,
                 'display_name': user.display_name,
                 'email': user.email,
-                'photo': user.photo if user.photo else None,
+                'photo': photo[0],
                 'token': token.key,
 
             }
