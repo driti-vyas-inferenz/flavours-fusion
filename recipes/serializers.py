@@ -1,9 +1,7 @@
-from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.db.models import Avg
 from rest_framework import serializers
-from django.contrib.auth.models import User
-from rest_framework.validators import UniqueValidator
-from django.contrib.auth.password_validation import validate_password
+
 from .models import *
 from users.serializers import UserRegisterSerializer
 
@@ -27,13 +25,15 @@ class RecipeSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source='category.name', read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), write_only=True)
     photo = serializers.ImageField(required=False, allow_null=True)
+    average_ratings = serializers.SerializerMethodField('get_overall_ratings')
 
     class Meta:
         model = Recipe
         fields = ('id', 'title', 'description', 'steps',
                   'cook_time', 'serving', 'photo',
                   'created', 'modified', 'user', 'ingredients',
-                  'ingredients_id', 'category_id', 'category'
+                  'ingredients_id', 'category_id', 'category',
+                  'average_ratings',
                   )
 
     def create(self, validated_data):
@@ -88,6 +88,14 @@ class RecipeSerializer(serializers.ModelSerializer):
             instance.save()
 
             return instance
+
+    def get_overall_ratings(self, obj):
+        """
+        This method calculates average ratings for each recipe.
+        """
+        avg = RecipeRatings.objects.filter(recipe=obj).aggregate(average=Avg('ratings'))
+        avg = round(avg.get('average')) if avg.get('average') is not None else None
+        return avg
 
 
 class RecipeRatingSerializer(serializers.ModelSerializer):
