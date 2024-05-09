@@ -105,3 +105,36 @@ class Recipe(models.Model):
         return self.title
 
 
+class RecipeRatings(models.Model):
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               verbose_name='Recipe',
+                               null=False, blank=False,)
+
+    user = models.ForeignKey('users.User',
+                             on_delete=models.CASCADE,
+                             verbose_name=_('User'),
+                             null=False, blank=False,
+                             related_name="user_ratings"
+                             )
+
+    ratings = models.PositiveIntegerField(verbose_name=_('Rating'),
+                                          null=True, blank=True,
+                                          default=0
+                                          )
+
+    review = models.TextField(verbose_name='Reviews',
+                              null=True, blank=True
+                              )
+
+    created = models.DateTimeField(verbose_name=_('Created'), auto_now_add=True)
+    modified = models.DateTimeField(verbose_name=_('Modified'), auto_now=True)
+
+    class Meta:
+        verbose_name = "Recipe Rating"
+        verbose_name_plural = "Recipe Ratings"
+
+    def __str__(self):
+        return str(self.recipe.title)
+
+

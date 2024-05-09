@@ -48,7 +48,6 @@ class RecipeSerializer(serializers.ModelSerializer):
 
             user = self.context.get('user')
             ing_ids = validated_data.get('ingredients_id', [])
-            print("\n ing_ids --> ", ing_ids)
 
             ing_objs = Ingredient.objects.filter(id__in=ing_ids)
 
@@ -80,14 +79,19 @@ class RecipeSerializer(serializers.ModelSerializer):
 
             if len(ing_ids) != 0:
                 ing_objs = Ingredient.objects.filter(id__in=ing_ids)
-                print("\n ing_objs --> ", ing_objs)
 
                 instance.ingredients.clear()
 
                 for ing_obj in ing_objs:
-                    print("\n obj --> ", ing_obj)
                     instance.ingredients.add(ing_obj)
 
             instance.save()
 
             return instance
+
+
+class RecipeRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RecipeRatings
+        fields = '__all__'
+

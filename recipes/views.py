@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, authentication, permissions
 from rest_framework.response import Response
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter
 
@@ -187,3 +187,21 @@ class RecipesListAPI(ListAPIView):
         return Response(response, status=status.HTTP_200_OK)
 
 
+class RecipeRatingsCreateAPI(CreateAPIView):
+    serializer_class = RecipeRatingSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        user = request.user
+        data['user'] = user.id
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({
+            'message': 'Ratings Saved Successfully!',
+            'status': status.HTTP_201_CREATED,
+            'data': serializer.data
+        })

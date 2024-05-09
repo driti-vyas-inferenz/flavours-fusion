@@ -24,6 +24,12 @@ class RecipeAdmin(admin.ModelAdmin):
     get_user_name.short_description = 'Recipe By'
 
 
+class RatingsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'recipe', 'review', 'ratings', 'created', 'modified')
+    search_fields = ('id', 'recipe')
+
+
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(RecipeRatings, RatingsAdmin)
