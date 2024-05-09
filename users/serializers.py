@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 
@@ -12,14 +12,17 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
-    gender =serializers.ChoiceField(User.GENDER, required=True)
+    gender = serializers.ChoiceField(User.GENDER, required=True)
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
     photo = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = User
-        fields = ('password', 'password2', 'email', 'first_name', 'last_name', 'gender', 'photo', 'display_name', 'mobile')
+        fields = ('password', 'password2', 'first_name',
+                  'last_name', 'email', 'mobile',
+                  'gender', 'photo', 'display_name',
+                  )
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True},

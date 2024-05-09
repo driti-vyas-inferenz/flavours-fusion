@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import validate_image_file_extension
 
 
 class Ingredient(models.Model):
@@ -85,6 +86,13 @@ class Recipe(models.Model):
                                           null=False, blank=False,
                                           default=1
                                           )
+
+    photo = models.ImageField(verbose_name=_("Recipe Image"),
+                              upload_to="recipes/",
+                              blank=True,
+                              null=True,
+                              validators=[validate_image_file_extension],
+                            )
 
     created = models.DateTimeField(verbose_name=_('Created'), auto_now_add=True)
     modified = models.DateTimeField(verbose_name=_('Modified'), auto_now=True)
