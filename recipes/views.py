@@ -1,10 +1,14 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, authentication, permissions
 from rest_framework.response import Response
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter
 
 from .permissions import IsCreator
 from .serializers import *
 from .models import *
+from .filters import *
 
 
 class CategoryModelViewset(ModelViewSet):
@@ -164,4 +168,40 @@ class RecipeModelViewset(ModelViewSet):
         })
 
 
+class RecipesListAPI(ListAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "category__name", "cook_time"]
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+
+        response = {
+            'message': "Recipes List",
+            'status': status.HTTP_200_OK,
+            'results': serializer.data
+        }
+
+        return Response(response, status=status.HTTP_200_OK)
+
+
+class RecipeRatingsCreateAPI(CreateAPIView):
+    serializer_class = RecipeRatingSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        user = request.user
+        data['user'] = user.id
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({
+            'message': 'Ratings Saved Successfully!',
+            'status': status.HTTP_201_CREATED,
+            'data': serializer.data
+        })

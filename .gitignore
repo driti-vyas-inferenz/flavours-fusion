@@ -30,6 +30,8 @@ MANIFEST
 
 # Environments
 flavours_venv/
+*/migrations/
+/media/
 
 # Django stuff:
 *.log
