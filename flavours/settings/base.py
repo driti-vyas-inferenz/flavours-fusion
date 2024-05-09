@@ -25,6 +25,7 @@ INSTALLED_APPS = [
 
     # Django apps
     'users',
+    'recipes',
 ]
 
 MIDDLEWARE = [
