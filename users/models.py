@@ -29,8 +29,6 @@ class User(AbstractUser):
     mobile = models.CharField(
         verbose_name=_("Mobile Number"),
         unique=True,
-        null=True,
-        blank=True,
         max_length=20,
     )
 
@@ -43,6 +41,8 @@ class User(AbstractUser):
         null=True,
         validators=[validate_image_file_extension],
     )
+
+    modified = models.DateTimeField(verbose_name=_('Modified'), auto_now=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
