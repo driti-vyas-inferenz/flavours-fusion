@@ -1,10 +1,14 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, authentication, permissions
 from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter
 
 from .permissions import IsCreator
 from .serializers import *
 from .models import *
+from .filters import *
 
 
 class CategoryModelViewset(ModelViewSet):
@@ -163,5 +167,23 @@ class RecipeModelViewset(ModelViewSet):
             'data': []
         })
 
+
+class RecipesListAPI(ListAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "category__name", "cook_time"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+
+        response = {
+            'message': "Recipes List",
+            'status': status.HTTP_200_OK,
+            'results': serializer.data
+        }
+
+        return Response(response, status=status.HTTP_200_OK)
 
 
